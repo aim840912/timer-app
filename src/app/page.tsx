@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { Bell, Timer as TimerIcon } from 'lucide-react'
 import type { Alarm, AlarmInput } from '@/types/alarm'
 import type { Timer } from '@/types/timer'
@@ -18,11 +18,28 @@ import { EarlyNotification } from '@/components/EarlyNotification'
 import { TimerList } from '@/components/TimerList'
 import { TimerForm } from '@/components/TimerForm'
 import { TimerRinging } from '@/components/TimerRinging'
+import VolumeControl from '@/components/VolumeControl'
+import { loadSettings, saveSettings } from '@/lib/settings-storage'
 import { ALARM_SOUND } from '@/types/alarm'
 
 export default function Home() {
   // Tab 切換狀態
   const [activeTab, setActiveTab] = useState<'alarms' | 'timers'>('alarms')
+
+  // 音量狀態
+  const [volume, setVolume] = useState(0.5) // 預設 50%
+
+  // 載入音量設定
+  useEffect(() => {
+    const settings = loadSettings()
+    setVolume(settings.volume)
+  }, [])
+
+  // 處理音量變更
+  const handleVolumeChange = useCallback((newVolume: number) => {
+    setVolume(newVolume)
+    saveSettings({ volume: newVolume })
+  }, [])
 
   // 鬧鈴相關
   const {
@@ -48,7 +65,18 @@ export default function Home() {
   } = useTimers()
 
   // 音效播放器（共用）
-  const { play, stop } = useAudioPlayer()
+  const { play, stop, setVolume: setAudioVolume, resumeAudioContext } = useAudioPlayer(volume)
+
+  // 同步音量到音效播放器
+  useEffect(() => {
+    setAudioVolume(volume)
+  }, [volume, setAudioVolume])
+
+  // 處理測試聲音（僅開發模式）
+  const handleTestSound = useCallback(() => {
+    resumeAudioContext()
+    play(ALARM_SOUND)
+  }, [resumeAudioContext, play])
 
   // 鬧鈴 UI 狀態
   const [showForm, setShowForm] = useState(false)
@@ -280,32 +308,42 @@ export default function Home() {
               </button>
             </div>
 
-            {/* 右側操作按鈕 */}
-            <div className="flex gap-2">
-              {activeTab === 'alarms' && (
-                <>
+            {/* 音量控制和右側操作按鈕 */}
+            <div className="flex items-center gap-3">
+              <VolumeControl
+                volume={volume}
+                onChange={handleVolumeChange}
+                onInteraction={resumeAudioContext}
+                onTestSound={handleTestSound}
+              />
+
+              {/* 右側操作按鈕 */}
+              <div className="flex gap-2">
+                {activeTab === 'alarms' && (
+                  <>
+                    <button
+                      onClick={handleBatchImport}
+                      className="rounded-lg bg-zinc-100 px-3 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
+                    >
+                      批次匯入
+                    </button>
+                    <button
+                      onClick={handleAdd}
+                      className="rounded-lg bg-blue-600 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
+                    >
+                      + 新增鬧鈴
+                    </button>
+                  </>
+                )}
+                {activeTab === 'timers' && (
                   <button
-                    onClick={handleBatchImport}
-                    className="rounded-lg bg-zinc-100 px-3 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
-                  >
-                    批次匯入
-                  </button>
-                  <button
-                    onClick={handleAdd}
+                    onClick={handleAddTimer}
                     className="rounded-lg bg-blue-600 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
                   >
-                    + 新增鬧鈴
+                    + 新增計時器
                   </button>
-                </>
-              )}
-              {activeTab === 'timers' && (
-                <button
-                  onClick={handleAddTimer}
-                  className="rounded-lg bg-blue-600 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
-                >
-                  + 新增計時器
-                </button>
-              )}
+                )}
+              </div>
             </div>
           </div>
         </div>

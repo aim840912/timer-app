@@ -1,12 +1,13 @@
 'use client'
 
 import { useCallback, useRef } from 'react'
-import { Howl } from 'howler'
+import { Howl, Howler } from 'howler'
 import { getAssetPath } from '@/lib/asset-path'
 
-export const useAudioPlayer = () => {
+export const useAudioPlayer = (initialVolume: number = 1.0) => {
   const currentSoundRef = useRef<Howl | null>(null)
   const isPlayingRef = useRef<boolean>(false)
+  const volumeRef = useRef<number>(initialVolume)
 
   /**
    * 停止播放音效
@@ -40,7 +41,7 @@ export const useAudioPlayer = () => {
       const sound = new Howl({
         src: [assetPath],
         loop: false, // 播放一次後停止
-        volume: 1.0, // 音量 100%（從 0.7 提高）
+        volume: volumeRef.current, // 使用當前設定的音量
         onload: () => {
           console.log('[Audio] 音效載入成功')
         },
@@ -76,6 +77,7 @@ export const useAudioPlayer = () => {
    */
   const setVolume = useCallback((volume: number) => {
     const clampedVolume = Math.max(0, Math.min(1, volume))
+    volumeRef.current = clampedVolume
     if (currentSoundRef.current) {
       currentSoundRef.current.volume(clampedVolume)
     }
@@ -88,10 +90,21 @@ export const useAudioPlayer = () => {
     return isPlayingRef.current
   }, [])
 
+  /**
+   * 恢復 AudioContext（解決瀏覽器 autoplay 限制）
+   */
+  const resumeAudioContext = useCallback(() => {
+    if (Howler.ctx && Howler.ctx.state === 'suspended') {
+      console.log('[Audio] Resuming AudioContext')
+      Howler.ctx.resume()
+    }
+  }, [])
+
   return {
     play,
     stop,
     setVolume,
     isPlaying,
+    resumeAudioContext,
   }
 }

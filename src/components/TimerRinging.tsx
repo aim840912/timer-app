@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect } from 'react'
-import { X, RotateCcw } from 'lucide-react'
+import { X, RotateCcw, Clock } from 'lucide-react'
 import { motion } from 'framer-motion'
 import type { Timer } from '@/types/timer'
 
@@ -40,7 +40,7 @@ export const TimerRinging = ({ timer, onStop, onRestart }: TimerRingingProps) =>
         animate={{ opacity: 1, scale: 1 }}
         className="w-full max-w-md px-6 text-center"
       >
-        {/* 鈴鐺圖示動畫 */}
+        {/* 時鐘圖示動畫 */}
         <motion.div
           animate={{
             scale: [1, 1.2, 1],
@@ -53,7 +53,7 @@ export const TimerRinging = ({ timer, onStop, onRestart }: TimerRingingProps) =>
           className="mb-8 inline-block"
         >
           <div className="rounded-full bg-white/10 p-8">
-            <div className="text-8xl">⏰</div>
+            <Clock className="h-16 w-16 text-white" aria-hidden="true" />
           </div>
         </motion.div>
 
