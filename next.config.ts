@@ -16,8 +16,8 @@ const nextConfig: NextConfig = {
   // GitHub Pages 路徑配置
   // 如果你的 repo 名稱不是 <username>.github.io，需要設定 basePath
   // 範例：repo 名稱是 timer-app，則設定 basePath: '/timer-app'
-  // basePath: '/timer-app',
-  // assetPrefix: '/timer-app',
+  basePath: '/timer-app',
+  assetPrefix: '/timer-app',
 
   // 圖片優化配置（靜態匯出模式不支援圖片優化）
   images: {
