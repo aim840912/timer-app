@@ -25,22 +25,38 @@ export const useAudioPlayer = () => {
    */
   const play = useCallback(
     (soundFile: string) => {
+      console.log('[Audio] 嘗試播放:', soundFile)
+
       // 停止現有音效
       if (isPlayingRef.current) {
+        console.log('[Audio] 停止現有音效')
         stop()
       }
 
       // 建立新的 Howl 實例
+      const assetPath = getAssetPath(`/sounds/${soundFile}`)
+      console.log('[Audio] 完整路徑:', assetPath)
+
       const sound = new Howl({
-        src: [getAssetPath(`/sounds/${soundFile}`)],
+        src: [assetPath],
         loop: false, // 播放一次後停止
-        volume: 0.7, // 預設音量 70%
+        volume: 1.0, // 音量 100%（從 0.7 提高）
+        onload: () => {
+          console.log('[Audio] 音效載入成功')
+        },
+        onplay: () => {
+          console.log('[Audio] 開始播放')
+        },
+        onend: () => {
+          console.log('[Audio] 播放結束')
+          isPlayingRef.current = false
+        },
         onloaderror: (id, error) => {
-          console.error(`音效載入失敗 (${soundFile}):`, error)
+          console.error(`[Audio] 載入失敗 (${soundFile}):`, error)
           isPlayingRef.current = false
         },
         onplayerror: (id, error) => {
-          console.error(`音效播放失敗 (${soundFile}):`, error)
+          console.error(`[Audio] 播放失敗 (${soundFile}):`, error)
           isPlayingRef.current = false
         },
       })
@@ -49,7 +65,8 @@ export const useAudioPlayer = () => {
       isPlayingRef.current = true
 
       // 播放音效
-      sound.play()
+      const playPromise = sound.play()
+      console.log('[Audio] play() 已呼叫, playPromise:', playPromise)
     },
     [stop]
   )
