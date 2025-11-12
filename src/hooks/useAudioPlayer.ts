@@ -2,6 +2,7 @@
 
 import { useCallback, useRef } from 'react'
 import { Howl } from 'howler'
+import { getAssetPath } from '@/lib/asset-path'
 
 export const useAudioPlayer = () => {
   const currentSoundRef = useRef<Howl | null>(null)
@@ -31,7 +32,7 @@ export const useAudioPlayer = () => {
 
       // 建立新的 Howl 實例
       const sound = new Howl({
-        src: [`/sounds/${soundFile}`],
+        src: [getAssetPath(`/sounds/${soundFile}`)],
         loop: false, // 播放一次後停止
         volume: 0.7, // 預設音量 70%
         onloaderror: (id, error) => {
