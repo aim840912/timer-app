@@ -1,0 +1,117 @@
+@import "tailwindcss";
+
+/* 淺色模式變數 */
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+  --card-bg: #ffffff;
+  --card-bg-secondary: #f8f9fa;
+  --card-border: #e5e7eb;
+  --text-primary: #171717;
+  --text-secondary: #6b7280;
+  --text-tertiary: #9ca3af;
+  --input-bg: #ffffff;
+  --input-border: #d1d5db;
+  --input-border-focus: #3b82f6;
+  --hover-bg: #f3f4f6;
+  --divider: #e5e7eb;
+  --primary: #3b82f6;
+  --primary-hover: #2563eb;
+  --primary-light: #dbeafe;
+  --success: #10b981;
+  --warning: #f59e0b;
+  --error: #ef4444;
+}
+
+/* 深色模式變數 (class-based) */
+.dark {
+  --background: #0a0a0a;
+  --foreground: #ededed;
+  --card-bg: #18181b;
+  --card-bg-secondary: #27272a;
+  --card-border: #3f3f46;
+  --text-primary: #fafafa;
+  --text-secondary: #a1a1aa;
+  --text-tertiary: #71717a;
+  --input-bg: #27272a;
+  --input-border: #3f3f46;
+  --input-border-focus: #60a5fa;
+  --hover-bg: #27272a;
+  --divider: #3f3f46;
+  --primary: #60a5fa;
+  --primary-hover: #3b82f6;
+  --primary-light: #1e3a8a;
+  --success: #34d399;
+  --warning: #fbbf24;
+  --error: #f87171;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card-bg: var(--card-bg);
+  --color-card-bg-secondary: var(--card-bg-secondary);
+  --color-card-border: var(--card-border);
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-tertiary: var(--text-tertiary);
+  --color-input-bg: var(--input-bg);
+  --color-input-border: var(--input-border);
+  --color-input-border-focus: var(--input-border-focus);
+  --color-hover-bg: var(--hover-bg);
+  --color-divider: var(--divider);
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-light: var(--primary-light);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-error: var(--error);
+
+  --animate-spin-reverse: spin-reverse 1s linear infinite;
+  --animate-pulse-slow: pulse-slow 3s ease-in-out infinite;
+}
+
+/* 自定義動畫 */
+@keyframes spin-reverse {
+  from {
+    transform: rotate(360deg);
+  }
+  to {
+    transform: rotate(0deg);
+  }
+}
+
+@keyframes pulse-slow {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* 自定義捲軸樣式 */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--background);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--text-tertiary);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-secondary);
+}
