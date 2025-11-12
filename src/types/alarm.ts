@@ -33,9 +33,6 @@ export interface Alarm {
   /** 建立時間戳記 */
   createdAt: number
 
-  /** 貪睡延後至此時間戳記 */
-  snoozedUntil?: number
-
   /** 提前提醒設定 */
   earlyNotification: {
     /** 是否啟用提前提醒 */
@@ -61,12 +58,6 @@ export interface CurrentTime {
 }
 
 /**
- * 可用的鬧鈴音效
+ * 鬧鈴音效（固定使用輕快鐘聲）
  */
-export const ALARM_SOUNDS = {
-  DEFAULT: 'alarm-default.mp3',
-  GENTLE: 'alarm-gentle.mp3',
-  CLASSIC: 'alarm-classic.mp3',
-} as const
-
-export type AlarmSoundType = typeof ALARM_SOUNDS[keyof typeof ALARM_SOUNDS]
+export const ALARM_SOUND = 'sound-bell.mp3'

@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { X } from 'lucide-react'
 import { motion } from 'framer-motion'
 import type { Alarm, AlarmInput } from '@/types/alarm'
-import { ALARM_SOUNDS } from '@/types/alarm'
+import { ALARM_SOUND } from '@/types/alarm'
 
 interface AlarmFormProps {
   alarm?: Alarm // 如果提供則為編輯模式
@@ -20,7 +20,6 @@ export const AlarmForm = ({ alarm, onSave, onCancel }: AlarmFormProps) => {
     alarm?.repeat.type ?? 'daily'
   )
   const [customDays, setCustomDays] = useState<number[]>(alarm?.repeat.days ?? [])
-  const [sound, setSound] = useState(alarm?.sound ?? ALARM_SOUNDS.DEFAULT)
   const [earlyNotificationEnabled, setEarlyNotificationEnabled] = useState(
     alarm?.earlyNotification?.enabled ?? true
   )
@@ -47,8 +46,7 @@ export const AlarmForm = ({ alarm, onSave, onCancel }: AlarmFormProps) => {
         type: repeatType,
         days: repeatType === 'custom' ? customDays : undefined,
       },
-      sound,
-      snoozedUntil: alarm?.snoozedUntil,
+      sound: ALARM_SOUND,
       earlyNotification: {
         enabled: earlyNotificationEnabled,
         minutesBefore: earlyNotificationMinutes,
@@ -207,26 +205,6 @@ export const AlarmForm = ({ alarm, onSave, onCancel }: AlarmFormProps) => {
               ))}
             </div>
           )}
-        </div>
-
-        {/* 音效選擇 */}
-        <div className="mb-6">
-          <label
-            htmlFor="alarm-sound"
-            className="mb-2 block text-sm font-medium text-zinc-700 dark:text-zinc-300"
-          >
-            音效
-          </label>
-          <select
-            id="alarm-sound"
-            value={sound}
-            onChange={(e) => setSound(e.target.value)}
-            className="w-full rounded-2xl border-2 border-zinc-200 bg-white px-4 py-3 text-black focus:border-blue-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
-          >
-            <option value={ALARM_SOUNDS.DEFAULT}>預設鬧鈴</option>
-            <option value={ALARM_SOUNDS.GENTLE}>溫和音效</option>
-            <option value={ALARM_SOUNDS.CLASSIC}>經典鬧鐘</option>
-          </select>
         </div>
 
         {/* 提前提醒 */}

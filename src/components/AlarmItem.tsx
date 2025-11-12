@@ -1,8 +1,9 @@
 'use client'
 
+import { useMemo } from 'react'
 import { Tag, Repeat, Edit, Trash2 } from 'lucide-react'
 import type { Alarm } from '@/types/alarm'
-import { formatTime, getRepeatText, isSnoozing } from '@/lib/alarm-utils'
+import { formatTime12Hour, getRepeatText, isAlarmPassed } from '@/lib/alarm-utils'
 
 interface AlarmItemProps {
   alarm: Alarm
@@ -12,7 +13,16 @@ interface AlarmItemProps {
 }
 
 export const AlarmItem = ({ alarm, onToggle, onEdit, onDelete }: AlarmItemProps) => {
-  const isSnoozed = isSnoozing(alarm)
+  // 判斷時間是否已過
+  const isPassed = useMemo(() => {
+    const now = new Date()
+    return isAlarmPassed(alarm, {
+      hour: now.getHours(),
+      minute: now.getMinutes(),
+      day: now.getDay(),
+      timestamp: now.getTime(),
+    })
+  }, [alarm])
 
   // 根據標籤內容判斷顏色
   const getLabelColor = (label: string) => {
@@ -46,9 +56,11 @@ export const AlarmItem = ({ alarm, onToggle, onEdit, onDelete }: AlarmItemProps)
       className={`
         rounded-xl border p-3 transition-all
         ${
-          alarm.enabled
-            ? 'border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900'
-            : 'border-zinc-100 bg-zinc-50 dark:border-zinc-900 dark:bg-zinc-950'
+          !alarm.enabled
+            ? 'border-zinc-100 bg-zinc-50 dark:border-zinc-900 dark:bg-zinc-950'
+            : isPassed
+            ? 'border-red-100 bg-red-50 dark:border-red-900 dark:bg-red-950'
+            : 'border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900'
         }
       `}
     >
@@ -62,12 +74,7 @@ export const AlarmItem = ({ alarm, onToggle, onEdit, onDelete }: AlarmItemProps)
             ${alarm.enabled ? 'text-black dark:text-white' : 'text-zinc-400 dark:text-zinc-600'}
           `}
           >
-            {formatTime(alarm.time.hour, alarm.time.minute)}
-            {isSnoozed && (
-              <span className="text-sm text-orange-600 dark:text-orange-400">
-                貪睡中
-              </span>
-            )}
+            {formatTime12Hour(alarm.time.hour, alarm.time.minute)}
           </div>
 
           {/* 標籤 */}

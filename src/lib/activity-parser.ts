@@ -1,5 +1,5 @@
 import type { AlarmInput } from '@/types/alarm'
-import { ALARM_SOUNDS } from '@/types/alarm'
+import { ALARM_SOUND } from '@/types/alarm'
 
 /**
  * 解析活動時間表的單行文字
@@ -77,7 +77,7 @@ function activityToAlarms(activity: ParsedActivity): AlarmInput[] {
     repeat: {
       type: 'daily' as const,
     },
-    sound: ALARM_SOUNDS.DEFAULT,
+    sound: ALARM_SOUND,
     earlyNotification: {
       enabled: true,
       minutesBefore: 3,

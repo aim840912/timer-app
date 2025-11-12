@@ -7,11 +7,6 @@ export const shouldRing = (alarm: Alarm, current: CurrentTime): boolean => {
   // 檢查是否已啟用
   if (!alarm.enabled) return false
 
-  // 檢查是否在貪睡延後時間內
-  if (alarm.snoozedUntil && current.timestamp < alarm.snoozedUntil) {
-    return false
-  }
-
   // 檢查時間是否匹配
   if (alarm.time.hour !== current.hour || alarm.time.minute !== current.minute) {
     return false
@@ -100,21 +95,6 @@ export const generateId = (): string => {
 }
 
 /**
- * 計算貪睡後的時間戳記
- */
-export const calculateSnoozeTime = (minutes: number): number => {
-  return Date.now() + minutes * 60 * 1000
-}
-
-/**
- * 檢查鬧鈴是否在貪睡中
- */
-export const isSnoozing = (alarm: Alarm): boolean => {
-  if (!alarm.snoozedUntil) return false
-  return Date.now() < alarm.snoozedUntil
-}
-
-/**
  * 檢查是否應該發送提前提醒
  */
 export const shouldSendEarlyNotification = (
@@ -126,11 +106,6 @@ export const shouldSendEarlyNotification = (
 
   // 檢查是否啟用提前提醒
   if (!alarm.earlyNotification.enabled) return false
-
-  // 檢查是否在貪睡延後時間內
-  if (alarm.snoozedUntil && current.timestamp < alarm.snoozedUntil) {
-    return false
-  }
 
   // 計算提前提醒的目標時間
   const targetTime = new Date()
@@ -183,5 +158,47 @@ export const getNextAlarmText = (alarm: Alarm): string => {
     return `${hours} 小時 ${minutes} 分鐘後`
   } else {
     return `${minutes} 分鐘後`
+  }
+}
+
+/**
+ * 判斷鬧鐘時間是否已過（針對當天）
+ */
+export const isAlarmPassed = (alarm: Alarm, current: CurrentTime): boolean => {
+  // 未啟用的鬧鐘不算已過
+  if (!alarm.enabled) {
+    return false
+  }
+
+  // 轉換為分鐘數以便比較
+  const alarmMinutes = alarm.time.hour * 60 + alarm.time.minute
+  const currentMinutes = current.hour * 60 + current.minute
+
+  // 如果當前時間還沒到鬧鐘時間，返回 false
+  if (currentMinutes <= alarmMinutes) {
+    return false
+  }
+
+  // 根據重複類型判斷
+  switch (alarm.repeat.type) {
+    case 'once':
+      // 一次性鬧鐘，時間過了就算已過
+      return true
+
+    case 'daily':
+      // 每天重複，今天這個時間過了算已過（但明天會再響）
+      return true
+
+    case 'weekdays':
+      // 工作日重複，檢查今天是否是工作日
+      const isWeekday = current.day >= 1 && current.day <= 5
+      return isWeekday
+
+    case 'custom':
+      // 自訂重複，檢查今天是否應該響
+      return alarm.repeat.days?.includes(current.day) ?? false
+
+    default:
+      return false
   }
 }

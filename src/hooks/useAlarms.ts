@@ -67,27 +67,6 @@ export const useAlarms = () => {
   }, [])
 
   /**
-   * 設定貪睡
-   */
-  const snoozeAlarm = useCallback((id: string, minutes: number): void => {
-    const snoozedUntil = Date.now() + minutes * 60 * 1000
-    setAlarms((prev) =>
-      prev.map((alarm) => (alarm.id === id ? { ...alarm, snoozedUntil } : alarm))
-    )
-  }, [])
-
-  /**
-   * 清除貪睡
-   */
-  const clearSnooze = useCallback((id: string): void => {
-    setAlarms((prev) =>
-      prev.map((alarm) =>
-        alarm.id === id ? { ...alarm, snoozedUntil: undefined } : alarm
-      )
-    )
-  }, [])
-
-  /**
    * 取得單個鬧鈴
    */
   const getAlarm = useCallback(
@@ -118,8 +97,6 @@ export const useAlarms = () => {
     updateAlarm,
     deleteAlarm,
     toggleAlarm,
-    snoozeAlarm,
-    clearSnooze,
     getAlarm,
     getEnabledAlarms,
     clearAll,

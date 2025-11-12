@@ -14,9 +14,10 @@ export const loadAlarms = (): Alarm[] => {
 
     const alarms: Alarm[] = JSON.parse(data)
 
-    // 資料遷移：為舊資料補上 earlyNotification 欄位
+    // 資料遷移：為舊資料補上 earlyNotification 欄位並修復音效檔名
     return alarms.map((alarm) => ({
       ...alarm,
+      sound: 'sound-bell.mp3', // 統一使用固定音效
       earlyNotification: alarm.earlyNotification ?? {
         enabled: true,
         minutesBefore: 3,

@@ -1,18 +1,17 @@
 'use client'
 
 import { useEffect } from 'react'
-import { Bell, X, Clock } from 'lucide-react'
+import { Bell, X } from 'lucide-react'
 import { motion } from 'framer-motion'
 import type { Alarm } from '@/types/alarm'
-import { formatTime } from '@/lib/alarm-utils'
+import { formatTime12Hour } from '@/lib/alarm-utils'
 
 interface AlarmRingingProps {
   alarm: Alarm
   onStop: () => void
-  onSnooze: (minutes: number) => void
 }
 
-export const AlarmRinging = ({ alarm, onStop, onSnooze }: AlarmRingingProps) => {
+export const AlarmRinging = ({ alarm, onStop }: AlarmRingingProps) => {
   // 防止背景滾動
   useEffect(() => {
     document.body.style.overflow = 'hidden'
@@ -61,7 +60,7 @@ export const AlarmRinging = ({ alarm, onStop, onSnooze }: AlarmRingingProps) => 
         {/* 時間顯示 */}
         <div className="mb-6">
           <div className="mb-2 text-8xl font-light tabular-nums text-white">
-            {formatTime(alarm.time.hour, alarm.time.minute)}
+            {formatTime12Hour(alarm.time.hour, alarm.time.minute)}
           </div>
           {alarm.label && (
             <div className="text-xl text-white/80">{alarm.label}</div>
@@ -69,34 +68,13 @@ export const AlarmRinging = ({ alarm, onStop, onSnooze }: AlarmRingingProps) => 
         </div>
 
         {/* 操作按鈕 */}
-        <div className="space-y-3">
-          {/* 貪睡按鈕 */}
-          <div className="flex gap-2">
-            <button
-              onClick={() => onSnooze(5)}
-              className="flex-1 rounded-2xl bg-white/10 py-4 font-medium text-white backdrop-blur transition-colors hover:bg-white/20"
-            >
-              <Clock className="mx-auto mb-1 h-5 w-5" aria-hidden="true" />
-              貪睡 5 分鐘
-            </button>
-            <button
-              onClick={() => onSnooze(10)}
-              className="flex-1 rounded-2xl bg-white/10 py-4 font-medium text-white backdrop-blur transition-colors hover:bg-white/20"
-            >
-              <Clock className="mx-auto mb-1 h-5 w-5" aria-hidden="true" />
-              貪睡 10 分鐘
-            </button>
-          </div>
-
-          {/* 停止按鈕 */}
-          <button
-            onClick={onStop}
-            className="w-full rounded-2xl bg-white py-5 text-lg font-semibold text-black transition-transform hover:scale-105 active:scale-95"
-          >
-            <X className="mx-auto mb-1 h-6 w-6" aria-hidden="true" />
-            停止鬧鈴
-          </button>
-        </div>
+        <button
+          onClick={onStop}
+          className="w-full rounded-2xl bg-white py-5 text-lg font-semibold text-black transition-transform hover:scale-105 active:scale-95"
+        >
+          <X className="mx-auto mb-1 h-6 w-6" aria-hidden="true" />
+          停止鬧鈴
+        </button>
 
         {/* 提示文字 */}
         <p className="mt-6 text-sm text-white/60">

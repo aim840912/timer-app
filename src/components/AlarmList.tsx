@@ -21,12 +21,24 @@ export const AlarmList = ({
   onAdd,
   onBatchImport,
 }: AlarmListProps) => {
-  // 按時間排序鬧鈴
+  // 按距現在最近的時間排序鬧鈴
   const sortedAlarms = [...alarms].sort((a, b) => {
-    if (a.time.hour !== b.time.hour) {
-      return a.time.hour - b.time.hour
+    const now = new Date()
+
+    // 計算距離現在的分鐘數
+    const getMinutesUntil = (alarm: Alarm): number => {
+      const alarmDate = new Date()
+      alarmDate.setHours(alarm.time.hour, alarm.time.minute, 0, 0)
+
+      // 如果鬧鈴時間已過，視為明天
+      if (alarmDate <= now) {
+        alarmDate.setDate(alarmDate.getDate() + 1)
+      }
+
+      return (alarmDate.getTime() - now.getTime()) / (1000 * 60)
     }
-    return a.time.minute - b.time.minute
+
+    return getMinutesUntil(a) - getMinutesUntil(b)
   })
 
   return (

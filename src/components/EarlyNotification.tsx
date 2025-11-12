@@ -3,7 +3,7 @@
 import { motion } from 'framer-motion'
 import { Bell, X } from 'lucide-react'
 import type { Alarm } from '@/types/alarm'
-import { formatTime } from '@/lib/alarm-utils'
+import { formatTime12Hour } from '@/lib/alarm-utils'
 
 interface EarlyNotificationProps {
   alarm: Alarm
@@ -43,7 +43,7 @@ export const EarlyNotification = ({ alarm, onDismiss }: EarlyNotificationProps) 
         {/* 時間 */}
         <div className="mb-4 text-center">
           <div className="text-4xl font-light tabular-nums text-blue-600 dark:text-blue-400">
-            {formatTime(alarm.time.hour, alarm.time.minute)}
+            {formatTime12Hour(alarm.time.hour, alarm.time.minute)}
           </div>
           {alarm.label && (
             <div className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">{alarm.label}</div>
