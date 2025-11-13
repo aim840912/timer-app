@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import type { Alarm, AlarmInput } from '@/types/alarm'
 import { loadAlarms, saveAlarms } from '@/lib/alarm-storage'
-import { generateId } from '@/lib/alarm-utils'
+import { generateId } from '@/lib/utils'
 
 export const useAlarms = () => {
   // 初始狀態始終為空陣列，避免 SSR hydration 不匹配

@@ -3,6 +3,8 @@
  * 使用 localStorage 儲存使用者偏好設定
  */
 
+import { logger } from '@/lib/utils'
+
 const SETTINGS_KEY = 'app-settings'
 
 export interface AppSettings {
@@ -34,7 +36,7 @@ export function loadSettings(): AppSettings {
       ...parsed,
     }
   } catch (error) {
-    console.error('Failed to load settings:', error)
+    logger.error('Failed to load settings:', error)
     return DEFAULT_SETTINGS
   }
 }
@@ -50,6 +52,6 @@ export function saveSettings(settings: AppSettings): void {
   try {
     localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings))
   } catch (error) {
-    console.error('Failed to save settings:', error)
+    logger.error('Failed to save settings:', error)
   }
 }

@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useCallback, useEffect } from 'react'
-import { Bell, Timer as TimerIcon } from 'lucide-react'
 import type { Alarm, AlarmInput } from '@/types/alarm'
 import type { Timer } from '@/types/timer'
 import { useAlarms } from '@/hooks/useAlarms'
@@ -18,15 +17,17 @@ import { EarlyNotification } from '@/components/EarlyNotification'
 import { TimerList } from '@/components/TimerList'
 import { TimerForm } from '@/components/TimerForm'
 import { TimerRinging } from '@/components/TimerRinging'
-import VolumeControl from '@/components/VolumeControl'
+import AppHeader from '@/components/AppHeader'
 import { loadSettings, saveSettings } from '@/lib/settings-storage'
 import { ALARM_SOUND } from '@/types/alarm'
 
+type TabType = 'alarms' | 'timers'
+
 export default function Home() {
   // Tab 切換狀態
-  const [activeTab, setActiveTab] = useState<'alarms' | 'timers'>('alarms')
+  const [activeTab, setActiveTab] = useState<TabType>('alarms')
 
-  // 音量狀態
+  // 音量狀態（鬧鈴和計時器共用）
   const [volume, setVolume] = useState(0.5) // 預設 50%
 
   // 載入音量設定
@@ -44,7 +45,7 @@ export default function Home() {
   // 鬧鈴相關
   const {
     alarms,
-    isLoaded,
+    isLoaded: alarmsLoaded,
     addAlarm,
     updateAlarm,
     deleteAlarm,
@@ -54,7 +55,7 @@ export default function Home() {
   // 計時器相關
   const {
     timers,
-    isLoaded: isTimersLoaded,
+    isLoaded: timersLoaded,
     addTimer,
     updateTimer,
     deleteTimer,
@@ -64,7 +65,7 @@ export default function Home() {
     finishTimer,
   } = useTimers()
 
-  // 音效播放器（共用）
+  // 音效播放器（鬧鈴和計時器共用）
   const { play, stop, setVolume: setAudioVolume, resumeAudioContext } = useAudioPlayer(volume)
 
   // 同步音量到音效播放器
@@ -78,17 +79,12 @@ export default function Home() {
     play(ALARM_SOUND)
   }, [resumeAudioContext, play])
 
-  // 鬧鈴 UI 狀態
+  // === 鬧鈴相關狀態和處理 ===
   const [showForm, setShowForm] = useState(false)
   const [showBatchImport, setShowBatchImport] = useState(false)
   const [editingAlarm, setEditingAlarm] = useState<Alarm | undefined>()
   const [ringingAlarm, setRingingAlarm] = useState<Alarm | undefined>()
   const [earlyNotificationAlarm, setEarlyNotificationAlarm] = useState<Alarm | undefined>()
-
-  // 計時器 UI 狀態
-  const [showTimerForm, setShowTimerForm] = useState(false)
-  const [editingTimer, setEditingTimer] = useState<Timer | null>(null)
-  const [ringingTimer, setRingingTimer] = useState<Timer | undefined>()
 
   // 當提前提醒觸發時的處理
   const handleEarlyNotification = useCallback(
@@ -178,7 +174,10 @@ export default function Home() {
     setShowBatchImport(false)
   }
 
-  // ==================== 計時器處理函數 ====================
+  // === 計時器相關狀態和處理 ===
+  const [showTimerForm, setShowTimerForm] = useState(false)
+  const [editingTimer, setEditingTimer] = useState<Timer | null>(null)
+  const [ringingTimer, setRingingTimer] = useState<Timer | undefined>()
 
   // 當計時器完成時的處理
   const handleTimerFinished = useCallback(
@@ -262,7 +261,8 @@ export default function Home() {
   }
 
   // 等待載入完成
-  if (!isLoaded || !isTimersLoaded) {
+  const isLoaded = alarmsLoaded && timersLoaded
+  if (!isLoaded) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-zinc-50 dark:bg-black">
         <div className="text-zinc-600 dark:text-zinc-400">載入中...</div>
@@ -272,87 +272,44 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-black">
-      {/* Tab 切換 */}
-      <div className="border-b border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900">
-        <div className="mx-auto max-w-7xl px-4">
-          <div className="flex items-center justify-between">
-            {/* Tab 按鈕 */}
-            <div className="flex gap-1">
+      {/* Header 導航 */}
+      <AppHeader
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+        volume={volume}
+        onVolumeChange={handleVolumeChange}
+        onAudioInteraction={resumeAudioContext}
+        onTestSound={handleTestSound}
+        rightActions={
+          activeTab === 'alarms' ? (
+            <>
               <button
-                onClick={() => setActiveTab('alarms')}
-                className={`
-                  flex items-center gap-2 border-b-2 px-4 py-3 font-medium transition-colors
-                  ${
-                    activeTab === 'alarms'
-                      ? 'border-blue-600 text-blue-600 dark:border-blue-400 dark:text-blue-400'
-                      : 'border-transparent text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100'
-                  }
-                `}
+                onClick={handleBatchImport}
+                className="rounded-lg bg-zinc-100 px-3 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
               >
-                <Bell className="h-5 w-5" aria-hidden="true" />
-                <span>鬧鈴</span>
+                批次匯入
               </button>
               <button
-                onClick={() => setActiveTab('timers')}
-                className={`
-                  flex items-center gap-2 border-b-2 px-4 py-3 font-medium transition-colors
-                  ${
-                    activeTab === 'timers'
-                      ? 'border-blue-600 text-blue-600 dark:border-blue-400 dark:text-blue-400'
-                      : 'border-transparent text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100'
-                  }
-                `}
+                onClick={handleAdd}
+                className="rounded-lg bg-blue-600 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
               >
-                <TimerIcon className="h-5 w-5" aria-hidden="true" />
-                <span>計時器</span>
+                + 新增鬧鈴
               </button>
-            </div>
-
-            {/* 音量控制和右側操作按鈕 */}
-            <div className="flex items-center gap-3">
-              <VolumeControl
-                volume={volume}
-                onChange={handleVolumeChange}
-                onInteraction={resumeAudioContext}
-                onTestSound={handleTestSound}
-              />
-
-              {/* 右側操作按鈕 */}
-              <div className="flex gap-2">
-                {activeTab === 'alarms' && (
-                  <>
-                    <button
-                      onClick={handleBatchImport}
-                      className="rounded-lg bg-zinc-100 px-3 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
-                    >
-                      批次匯入
-                    </button>
-                    <button
-                      onClick={handleAdd}
-                      className="rounded-lg bg-blue-600 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
-                    >
-                      + 新增鬧鈴
-                    </button>
-                  </>
-                )}
-                {activeTab === 'timers' && (
-                  <button
-                    onClick={handleAddTimer}
-                    className="rounded-lg bg-blue-600 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
-                  >
-                    + 新增計時器
-                  </button>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+            </>
+          ) : (
+            <button
+              onClick={handleAddTimer}
+              className="rounded-lg bg-blue-600 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
+            >
+              + 新增計時器
+            </button>
+          )
+        }
+      />
 
       {/* 內容區域 */}
       <div className="mx-auto max-w-7xl px-4 py-6">
-        {/* 鬧鈴列表 */}
-        {activeTab === 'alarms' && (
+        {activeTab === 'alarms' ? (
           <AlarmList
             alarms={alarms}
             onToggle={toggleAlarm}
@@ -361,10 +318,7 @@ export default function Home() {
             onAdd={handleAdd}
             onBatchImport={handleBatchImport}
           />
-        )}
-
-        {/* 計時器列表 */}
-        {activeTab === 'timers' && (
+        ) : (
           <TimerList
             timers={timers}
             onStart={startTimer}
@@ -376,7 +330,7 @@ export default function Home() {
         )}
       </div>
 
-      {/* 新增/編輯表單 */}
+      {/* 新增/編輯鬧鈴表單 */}
       {showForm && (
         <AlarmForm alarm={editingAlarm} onSave={handleSave} onCancel={handleCancel} />
       )}

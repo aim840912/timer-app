@@ -40,12 +40,6 @@ export const formatDurationText = (seconds: number): string => {
   return `${secs} 秒`
 }
 
-/**
- * 生成唯一 ID
- */
-export const generateTimerId = (): string => {
-  return `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`
-}
 
 /**
  * 計算進度百分比（0-100）

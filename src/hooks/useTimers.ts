@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import type { Timer, TimerInput } from '@/types/timer'
 import { loadTimers, saveTimers } from '@/lib/timer-storage'
-import { generateTimerId } from '@/lib/timer-utils'
+import { generateId } from '@/lib/utils'
 
 export const useTimers = () => {
   const [timers, setTimers] = useState<Timer[]>([])
@@ -29,7 +29,7 @@ export const useTimers = () => {
   const addTimer = useCallback((input: TimerInput) => {
     const newTimer: Timer = {
       ...input,
-      id: generateTimerId(),
+      id: generateId(),
       createdAt: Date.now(),
       remainingTime: input.duration,
       status: 'idle',

@@ -1,4 +1,5 @@
 import type { Timer } from '@/types/timer'
+import { logger } from '@/lib/utils'
 
 const STORAGE_KEY = 'timers'
 
@@ -24,7 +25,7 @@ export const loadTimers = (): Timer[] => {
       pausedAt: undefined,
     }))
   } catch (error) {
-    console.error('載入計時器失敗:', error)
+    logger.error('載入計時器失敗:', error)
     return []
   }
 }
@@ -47,7 +48,7 @@ export const saveTimers = (timers: Timer[]): void => {
 
     localStorage.setItem(STORAGE_KEY, JSON.stringify(timersToSave))
   } catch (error) {
-    console.error('儲存計時器失敗:', error)
+    logger.error('儲存計時器失敗:', error)
   }
 }
 
@@ -60,6 +61,6 @@ export const clearTimers = (): void => {
   try {
     localStorage.removeItem(STORAGE_KEY)
   } catch (error) {
-    console.error('清除計時器失敗:', error)
+    logger.error('清除計時器失敗:', error)
   }
 }

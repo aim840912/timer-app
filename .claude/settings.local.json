@@ -149,7 +149,9 @@
       "WebFetch(domain:www.partnersinrhyme.com)",
       "WebFetch(domain:orangefreesounds.com)",
       "WebFetch(domain:mixkit.co)",
-      "WebFetch(domain:notificationsounds.com)"
+      "WebFetch(domain:notificationsounds.com)",
+      "Bash(npm uninstall:*)",
+      "Bash(git show:*)"
     ],
     "deny": [],
     "ask": [

@@ -87,12 +87,6 @@ export const formatWeekdays = (days: number[]): string => {
   return sortedDays.map((d) => dayNames[d]).join('、')
 }
 
-/**
- * 生成唯一 ID
- */
-export const generateId = (): string => {
-  return `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`
-}
 
 /**
  * 檢查是否應該發送提前提醒

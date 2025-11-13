@@ -31,18 +31,21 @@ export default function VolumeControl({ volume, onChange, onInteraction, onTestS
   return (
     <div className="flex items-center gap-2">
       <VolumeIcon className="h-5 w-5 text-gray-700 dark:text-gray-300" aria-label="音量" />
-      <input
-        type="range"
-        min="0"
-        max="100"
-        value={displayVolume}
-        onChange={handleChange}
-        className="h-2 w-24 cursor-pointer appearance-none rounded-lg bg-gray-200 dark:bg-gray-700"
-        style={{
-          background: `linear-gradient(to right, rgb(59 130 246) 0%, rgb(59 130 246) ${displayVolume}%, rgb(229 231 235) ${displayVolume}%, rgb(229 231 235) 100%)`,
-        }}
-        aria-label={`調整音量: ${displayVolume}%`}
-      />
+      <div className="relative h-2 w-24 rounded-lg bg-gray-200 dark:bg-gray-700">
+        <div
+          className="absolute left-0 top-0 h-full rounded-lg bg-blue-500 transition-all"
+          style={{ width: `${displayVolume}%` }}
+        />
+        <input
+          type="range"
+          min="0"
+          max="100"
+          value={displayVolume}
+          onChange={handleChange}
+          className="relative h-full w-full cursor-pointer appearance-none bg-transparent"
+          aria-label={`調整音量: ${displayVolume}%`}
+        />
+      </div>
       <span className="w-10 text-right text-sm text-gray-700 dark:text-gray-300">{displayVolume}%</span>
 
       {/* 測試聲音按鈕（僅開發模式） */}

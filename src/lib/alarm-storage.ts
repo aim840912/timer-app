@@ -1,4 +1,5 @@
 import type { Alarm } from '@/types/alarm'
+import { logger } from '@/lib/utils'
 
 const STORAGE_KEY = 'alarms'
 
@@ -24,7 +25,7 @@ export const loadAlarms = (): Alarm[] => {
       },
     }))
   } catch (error) {
-    console.error('載入鬧鈴失敗:', error)
+    logger.error('載入鬧鈴失敗:', error)
     return []
   }
 }
@@ -38,7 +39,7 @@ export const saveAlarms = (alarms: Alarm[]): void => {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(alarms))
   } catch (error) {
-    console.error('儲存鬧鈴失敗:', error)
+    logger.error('儲存鬧鈴失敗:', error)
   }
 }
 
@@ -51,6 +52,6 @@ export const clearAlarms = (): void => {
   try {
     localStorage.removeItem(STORAGE_KEY)
   } catch (error) {
-    console.error('清除鬧鈴失敗:', error)
+    logger.error('清除鬧鈴失敗:', error)
   }
 }
